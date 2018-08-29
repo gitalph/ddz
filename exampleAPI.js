@@ -1,5 +1,7 @@
 const http = require("http")
-const urls = {score: '/score_test395', shot: '/shot_test395'}
+const urls = {score: '/score_test_1', shot: '/shot_test_1',
+                select_combination: '/select_combination',
+                compare_combinations: '/compare_combinations'}
 const options = {
     hostname: 'localhost',
     port: 8080,
@@ -91,6 +93,10 @@ for (let i = 0; i < 51; i++) {
     deck.splice(rnd, 1)
     current_player_id = (current_player_id + 1) % 3
 }
+
+POST_req(urls.select_combination, {hand: [3,4,5,6,7]}).then(res => console.log('select_combination', res))
+POST_req(urls.compare_combinations, {handA: [3,4,5,6,7], handB: [52,53]}).then(res => console.log('compare_combinations', res))
+
 console.log('stakes round...')
 
 stakesRound({players}).then(lord_id => {

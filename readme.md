@@ -9,7 +9,11 @@
 1. moves - made moves is an array of arrays, for examle [[5],[6],[9],[10],[51],[27],[3,16,29,42],[],[]]
 1.wild_cards - the three leftover wild cards are revealed to all players before being dealt to the landlord.
 
-*card numbering:
+* tests:
+1. select_combination - for check shot. Has one parameters - "hand". Function will return number of rule ("result":37 for example or "result":"ERROR" if combination not exists)
+1. compare_combinations - for compare cards. Has two parameters - "handA" and "handB". Function will return "result" = -1,0,1 or null if it is impossible to compare
+
+*card numbering (suits are not important):
 * 0 A♥
 * 1 2♥
 * 2 3♥
@@ -62,5 +66,5 @@
 * 49 J♣
 * 50 Q♣
 * 51 K♣
-* 52 Colored Joker
-* 53 Black & White Joker
+* 52 Black Joker
+* 53 Colored Joker
