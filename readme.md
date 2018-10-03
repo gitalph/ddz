@@ -7,10 +7,10 @@
 1. hand - cards in the player's hand
 1. table_cards - cards on the table
 1. moves - made moves is an array of arrays, for examle [[5],[6],[9],[10],[51],[27],[3,16,29,42],[],[]]
-1.wild_cards - the three leftover wild cards are revealed to all players before being dealt to the landlord.
+1. wild_cards - the three leftover wild cards are revealed to all players before being dealt to the landlord.
 
 * saving game history:
-* save_logs - 7 parameters:
+* save_logs - 9 parameters:
 1. random_position - id игроков за столом (первый тот, с кого начинаются торги) `["PlayerB", "PlayerC", "PlayerA"]`
 1. stakes - сделанные игроками ставки (в том же порядке что они определены в random_position) `[0, 3]`
 1. landlord - игрок победивший в торговле (можно однозначно вычислить по random_position и stakes) `"PlayerC"`
@@ -18,7 +18,8 @@
 1. multiple - коэффициент зависящий от действий игроков, см правила (так же может быть посчитан на основе полной информации в moves). `4`
 1. winner - id победителя (точнее кто раньше всех скинул карты, помним, что фермеры побеждают вместе) `"PlayerA"`
 1. moves - последовательность всех действий совершенных игроками
-
+1. wild_cards - the three leftover wild cards are revealed to all players before being dealt to the landlord.
+1. starting_hands - карты игроков начиная с лорда  `[[0, 1, 2, 7, 14, 17, 23, 24, 30, 32, 33, 37, 41, 48, 49, 51, 53], [3, 8, 11, 12, 16, 18, 21, 26, 29, 31, 35, 38, 44, 45, 46, 47, 52], [4, 5, 6, 9, 10, 13, 15, 19, 20, 22, 25, 27, 28, 34, 36, 40, 50]]`
 
 * tests:
 1. select_combination - for check shot. Has one parameters - "hand". Function will return number of rule ("result":37 for example or "result":"ERROR" if combination not exists)
