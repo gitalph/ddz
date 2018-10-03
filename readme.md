@@ -19,6 +19,7 @@
 * winner - id победителя (точнее кто раньше всех скинул карты, помним, что фермеры побеждают вместе) `"PlayerA"`
 * moves - последовательность всех действий совершенных игроками
 
+
 * tests:
 1. select_combination - for check shot. Has one parameters - "hand". Function will return number of rule ("result":37 for example or "result":"ERROR" if combination not exists)
 1. compare_combinations - for compare cards. Has two parameters - "handA" and "handB". Function will return "result" = -1,0,1 or null if it is impossible to compare
