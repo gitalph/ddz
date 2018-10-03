@@ -9,6 +9,16 @@
 1. moves - made moves is an array of arrays, for examle [[5],[6],[9],[10],[51],[27],[3,16,29,42],[],[]]
 1.wild_cards - the three leftover wild cards are revealed to all players before being dealt to the landlord.
 
+* saving game history:
+1. save_logs - 7 parameters:
+* random_position - id игроков за столом (первый тот, с кого начинаются торги) `["PlayerB", "PlayerC", "PlayerA"]`
+* stakes - сделанные игроками ставки (в том же порядке что они определены в random_position) `[0, 3]`
+* landlord - игрок победивший в торговле (можно однозначно вычислить по random_position и stakes) `"PlayerC"`
+* call_score - максимальная ставка (также однозначно определяется по stakes) `3`
+* multiple - коэффициент зависящий от действий игроков, см правила (так же может быть посчитан на основе полной информации в moves). `4`
+* winner - id победителя (точнее кто раньше всех скинул карты, помним, что фермеры побеждают вместе) `"PlayerA"`
+* moves - последовательность всех действий совершенных игроками
+
 * tests:
 1. select_combination - for check shot. Has one parameters - "hand". Function will return number of rule ("result":37 for example or "result":"ERROR" if combination not exists)
 1. compare_combinations - for compare cards. Has two parameters - "handA" and "handB". Function will return "result" = -1,0,1 or null if it is impossible to compare

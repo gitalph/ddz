@@ -1,12 +1,15 @@
 const http = require("http")
 const urls = {score: '/score_test_1', shot: '/shot_test_1',
                 select_combination: '/select_combination',
-                compare_combinations: '/compare_combinations'}
+                compare_combinations: '/compare_combinations',
+                save_logs: '/save_logs'}
 const options = {
     hostname: 'localhost',
     port: 8080,
     method: 'POST'
   };
+
+let stakes = []
 
 if (~process.argv.indexOf('--port')) options.port = process.argv[process.argv.indexOf('--port') + 1];
 if (~process.argv.indexOf('--host')) options.hostname = process.argv[process.argv.indexOf('--host') + 1];
@@ -43,7 +46,7 @@ async function POST_req(path, data) {
 }
 
 async function stakesRound(params) {
-    let stakes = []
+
     let {players} = params
     let player_id = 0
     let lord_id = 0
@@ -109,5 +112,9 @@ stakesRound({players}).then(lord_id => {
             moves: []}).then(res => {
                 if (res === lord_id) console.log('Game Over! Landlord Win')
                 else console.log('Game Over! Peasants Win')
+                POST_req(urls.save_logs, {random_position, 
+                    hand: players[current_player_id].cards,
+                    moves,
+                    wild_cards})
             })
 })
