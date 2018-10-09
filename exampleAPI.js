@@ -10,6 +10,12 @@ const options = {
   };
 
 let stakes = []
+let random_position = ["PlayerB", "PlayerC", "PlayerA"]
+let landlord = 0
+let call_score = 0
+let multiple = 1
+let winner = 0
+let log_moves = []
 
 if (~process.argv.indexOf('--port')) options.port = process.argv[process.argv.indexOf('--port') + 1];
 if (~process.argv.indexOf('--host')) options.hostname = process.argv[process.argv.indexOf('--host') + 1];
@@ -76,6 +82,7 @@ async function playGame(params) {
     } else {// pass
         if (moves[moves.length - 2].length == 0) table_cards = [] // two players pass 
     }
+    log_moves = moves
     if (!players[current_player_id].cards.length) return current_player_id //win id
     return playGame({
         players, 
@@ -97,12 +104,18 @@ for (let i = 0; i < 51; i++) {
     current_player_id = (current_player_id + 1) % 3
 }
 
+let starting_hands = players.map(player => [...player.cards])
+
 POST_req(urls.select_combination, {hand: [3,4,5,6,7]}).then(res => console.log('select_combination', res))
 POST_req(urls.compare_combinations, {handA: [3,4,5,6,7], handB: [52,53]}).then(res => console.log('compare_combinations', res))
 
 console.log('stakes round...')
 
 stakesRound({players}).then(lord_id => {
+    landlord = random_position[lord_id]
+    if (lord_id > 0) starting_hands.push(starting_hands.shift())
+    if (lord_id === 2) starting_hands.push(starting_hands.shift())
+    call_score = Math.max(...stakes)
     players[lord_id].cards.push(...deck)
     console.log(`player: ${lord_id} is Lord, wild cards = ${cards_to_string(deck).join('')}`);
     playGame({players, 
@@ -110,11 +123,12 @@ stakesRound({players}).then(lord_id => {
             wild_cards: deck, // the three leftover wild cards
             table_cards: [], 
             moves: []}).then(res => {
+                winner = random_position[res]
                 if (res === lord_id) console.log('Game Over! Landlord Win')
                 else console.log('Game Over! Peasants Win')
-                POST_req(urls.save_logs, {random_position, 
-                    hand: players[current_player_id].cards,
-                    moves,
-                    wild_cards})
+                POST_req(urls.save_logs, {random_position, stakes, landlord, call_score, multiple, winner,
+                    moves: log_moves,
+                    wild_cards: deck,
+                    starting_hands})
             })
 })
