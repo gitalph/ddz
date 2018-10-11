@@ -1,42 +1,28 @@
 const http = require("http")
-const urls = {score: '/score_test_1', shot: '/shot_test_1',
-                select_combination: '/select_combination',
-                compare_combinations: '/compare_combinations',
-                save_logs: '/save_logs'}
-const options = {
-    hostname: 'localhost',
-    port: 8080,
-    method: 'POST'
-  };
+const gameConf = require('./config.json')
 
-let stakes = []
-let random_position = ["PlayerB", "PlayerC", "PlayerA"]
-let landlord = 0
-let call_score = 0
+const isDebug = process.argv.includes('-d')
+const isLoop = process.argv.includes('-l')
+
 let multiple = 1
-let winner = 0
 let log_moves = []
 
-if (~process.argv.indexOf('--port')) options.port = process.argv[process.argv.indexOf('--port') + 1];
-if (~process.argv.indexOf('--host')) options.hostname = process.argv[process.argv.indexOf('--host') + 1];
+const cards_to_string = (hand) => // B = Black & White Joker' C = 'Colored Joker
+    hand.map(p => p == 52 ? 'B' : p == 53 ? 'C' : 'A234567890JQK'[p % 13]).sort(
+        (a, b) => '34567890JQKA2BC'.indexOf(a) - '34567890JQKA2BC'.indexOf(b))
 
-function cards_to_string(hand) {
-    // B = Black & White Joker' C = 'Colored Joker
-    cards = hand.map(p => p == 52 ? 'B' : p == 53 ? 'C' : 'A234567890JQK'[p % 13])
-    cards.sort((a, b) => '34567890JQKA2BC'.indexOf(a) - '34567890JQKA2BC'.indexOf(b))
-    return cards
-}
-
-async function POST_req(path, data) {
+async function POST_req(options, path, data) {
     data = JSON.stringify(data)
-    // console.log(data);
+    if (isDebug) console.log(data);
     return new Promise(resolve => {
-        const req = http.request({...options, path, headers: {
+        const req = http.request({...options, path, method: 'POST', headers: {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(data)
           }}, (res) => {
-            // console.log(`STATUS: ${res.statusCode}`);
-            // console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+            if (isDebug) {
+                console.log(`STATUS: ${res.statusCode}`);
+                console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+            }
             res.setEncoding('utf8');
             let body = '';
             res.on('data', (chunk) => body += chunk);
@@ -52,15 +38,14 @@ async function POST_req(path, data) {
 }
 
 async function stakesRound(params) {
-
-    let {players} = params
+    let {players, stakes} = params
     let player_id = 0
     let lord_id = 0
     while (player_id < players.length) {
-        let req = await POST_req(urls.score, {stakes, 
+        let req = await POST_req(players[player_id], players[player_id].paths.score, {stakes, 
                                               hand: players[player_id].cards})
         stakes.push(req.score)
-        console.log(`player: ${player_id} call ${req.score} with hand ${cards_to_string(players[player_id].cards).join('')}`);
+        console.log(`${players[player_id].botId} call ${req.score} with hand ${cards_to_string(players[player_id].cards).join('')}`);
         if (req.score == 3) return player_id
         if (req.score > 0) lord_id = player_id
         player_id++
@@ -70,12 +55,12 @@ async function stakesRound(params) {
 
 async function playGame(params) {
     let {players, current_player_id, wild_cards, moves, table_cards} = params
-    let req = await POST_req(urls.shot, {table_cards, 
+    let req = await POST_req(players[current_player_id], players[current_player_id].paths.shot, {table_cards, 
                                         hand: players[current_player_id].cards,
                                         moves,
                                         wild_cards})
     moves.push(req.shot)
-    console.log(`player: ${current_player_id} shot '${cards_to_string(req.shot).join('')}'  ${cards_to_string(players[current_player_id].cards).join('')}`);
+    console.log(`${players[current_player_id].botId} shot '${cards_to_string(req.shot).join('')}'  ${cards_to_string(players[current_player_id].cards).join('')}`);
     if (req.shot.length) {
         players[current_player_id].cards = players[current_player_id].cards.filter(c => !req.shot.includes(c))
         table_cards = req.shot
@@ -93,42 +78,51 @@ async function playGame(params) {
     })
 }
 
-const players = [{cards:[]}, {cards:[]}, {cards:[]}]
-let deck = []
-for (let i = 0; i < 54; i++) deck.push(i)
-let current_player_id = 0
-for (let i = 0; i < 51; i++) {
-    let rnd = Math.floor(Math.random() * deck.length)
-    players[current_player_id].cards.push(deck[rnd])
-    deck.splice(rnd, 1)
-    current_player_id = (current_player_id + 1) % 3
+async function oneGame() {
+    do {
+        const players = gameConf.bots.map(b => ({...b, cards:[]}))
+        let iterCnt = Math.floor(Math.random() * 3)
+        while (iterCnt--) players.push(players.shift())
+        let deck = []
+        for (let i = 0; i < 54; i++) deck.push(i)
+        let current_player_id = 0
+        for (let i = 0; i < 51; i++) {
+            let rnd = Math.floor(Math.random() * deck.length)
+            players[current_player_id].cards.push(deck[rnd])
+            deck.splice(rnd, 1)
+            current_player_id = (current_player_id + 1) % 3
+        }
+
+        let starting_hands = players.map(player => [...player.cards])
+
+        console.log('stakes round...')
+
+        let stakes = []
+
+        let lord_id = await stakesRound({players, stakes})
+
+        if (lord_id > 0) starting_hands.push(starting_hands.shift())
+        if (lord_id === 2) starting_hands.push(starting_hands.shift())
+        let call_score = Math.max(...stakes)
+        players[lord_id].cards.push(...deck)
+        console.log(`${players[lord_id].botId} is Lord, wild cards = ${cards_to_string(deck).join('')}`);
+        let winner_id = await playGame({players, 
+                    current_player_id: lord_id, 
+                    wild_cards: deck, // the three leftover wild cards
+                    table_cards: [], 
+                    moves: []})
+        
+        if (winner_id === lord_id) console.log('Game Over! Landlord Win')
+        else console.log('Game Over! Peasants Win')
+        
+        await POST_req(gameConf.saveLogs, gameConf.saveLogs.path, {random_position: players.map(b => b.botId), 
+            landlord: players[lord_id].botId, 
+            stakes, call_score, multiple, 
+            winner: players[winner_id].botId,
+            moves: log_moves,
+            wild_cards: deck,
+            starting_hands})
+    } while (isLoop)
 }
 
-let starting_hands = players.map(player => [...player.cards])
-
-POST_req(urls.select_combination, {hand: [3,4,5,6,7]}).then(res => console.log('select_combination', res))
-POST_req(urls.compare_combinations, {handA: [3,4,5,6,7], handB: [52,53]}).then(res => console.log('compare_combinations', res))
-
-console.log('stakes round...')
-
-stakesRound({players}).then(lord_id => {
-    landlord = random_position[lord_id]
-    if (lord_id > 0) starting_hands.push(starting_hands.shift())
-    if (lord_id === 2) starting_hands.push(starting_hands.shift())
-    call_score = Math.max(...stakes)
-    players[lord_id].cards.push(...deck)
-    console.log(`player: ${lord_id} is Lord, wild cards = ${cards_to_string(deck).join('')}`);
-    playGame({players, 
-            current_player_id: lord_id, 
-            wild_cards: deck, // the three leftover wild cards
-            table_cards: [], 
-            moves: []}).then(res => {
-                winner = random_position[res]
-                if (res === lord_id) console.log('Game Over! Landlord Win')
-                else console.log('Game Over! Peasants Win')
-                POST_req(urls.save_logs, {random_position, stakes, landlord, call_score, multiple, winner,
-                    moves: log_moves,
-                    wild_cards: deck,
-                    starting_hands})
-            })
-})
+oneGame()

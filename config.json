@@ -1,0 +1,27 @@
+{
+    "bots": [
+        {
+            "botId": "PlayerA",
+            "hostname": "192.168.1.47",
+            "port": 8180,
+            "paths": {"score": "/score_test_1", "shot": "/shot_test_1"}
+        },
+        {
+            "botId": "PlayerB",
+            "hostname": "192.168.1.47",
+            "port": 8180,
+            "paths": {"score": "/score_test_1", "shot": "/shot_test_1"}
+        },
+        {
+            "botId": "PlayerC",
+            "hostname": "192.168.1.47",
+            "port": 8180,
+            "paths": {"score": "/score_test_1", "shot": "/shot_test_1"}
+        }
+    ],
+    "saveLogs": {
+        "hostname": "192.168.1.47",
+        "port": 8180,
+        "path": "/save_logs"
+    }
+}

@@ -1,7 +1,8 @@
 {
     "dependencies": {},
     "scripts": {
-        "start": "node exampleAPI.js "
+        "start": "node exampleAPI.js ",
+        "start-loop": "node exampleAPI.js -l"
       },
     "devDependencies": {
         "eslint-config-standard": "^11.0.0",
