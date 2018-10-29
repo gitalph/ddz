@@ -25,6 +25,10 @@
 1. select_combination - for check shot. Has one parameters - "hand". Function will return number of rule ("result":37 for example or "result":"ERROR" if combination not exists)
 1. compare_combinations - for compare cards. Has two parameters - "handA" and "handB". Function will return "result" = -1,0,1 or null if it is impossible to compare
 
+* dockerized:
+1. sudo docker build -t minibox .
+1. sudo docker run -it minibox
+
 *card numbering (suits are not important):
 * 1   A
 * 2   2
