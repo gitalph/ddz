@@ -8,7 +8,7 @@ let multiple = 1
 let log_moves = []
 
 const cards_to_string = (hand) => // B = Black & White Joker' C = 'Colored Joker
-    hand.map(p => p == 52 ? 'B' : p == 53 ? 'C' : 'A234567890JQK'[p % 13]).sort(
+    hand.map(p => p == 53 ? 'B' : p == 54 ? 'C' : 'A234567890JQK'[(p - 1) % 13]).sort(
         (a, b) => '34567890JQKA2BC'.indexOf(a) - '34567890JQKA2BC'.indexOf(b))
 
 async function POST_req(options, path, data) {
@@ -84,7 +84,7 @@ async function oneGame() {
         let iterCnt = Math.floor(Math.random() * 3)
         while (iterCnt--) players.push(players.shift())
         let deck = []
-        for (let i = 0; i < 54; i++) deck.push(i)
+        for (let i = 0; i < 54; i++) deck.push(i + 1)
         let current_player_id = 0
         for (let i = 0; i < 51; i++) {
             let rnd = Math.floor(Math.random() * deck.length)
