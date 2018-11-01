@@ -67,7 +67,11 @@ async function playGame(params) {
         players[current_player_id].cards = players[current_player_id].cards.filter(c => !req.shot.includes(c))
         table_cards = req.shot
     } else {// pass
-        if (moves[moves.length - 2].length == 0) table_cards = [] // two players pass 
+        try {
+            if (moves[moves.length - 2].length == 0) table_cards = [] // two players pass 
+        } catch {
+            
+        }
     }
     log_moves = moves
     if (!players[current_player_id].cards.length) return current_player_id //win id
