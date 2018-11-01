@@ -38,19 +38,19 @@ async function POST_req(options, path, data) {
 }
 
 async function stakesRound(params) {
-    let {players, stakes, s_hands} = params
+    let {players, stakes, starting_hands} = params
     let player_id = 0
     let lord_id = 0
-    let starting_hands = s_hands.map(h => [...h])
+    let starting_hands2 = starting_hands.map(h => [...h])
     while (player_id < players.length) {
         let req = await POST_req(players[player_id], players[player_id].paths.score, {stakes, 
-                                              hand: players[player_id].cards, starting_hands})
+                                              hand: players[player_id].cards, starting_hands: starting_hands2})
         stakes.push(req.score)
         console.log(`${players[player_id].botId} call ${req.score} with hand ${cards_to_string(players[player_id].cards).join('')}`);
         if (req.score == 3) return player_id
         if (req.score > 0) lord_id = player_id
         player_id++
-        starting_hands.push(starting_hands.shift())
+        starting_hands2.push(starting_hands2.shift())
     }
     return lord_id
 }
