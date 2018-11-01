@@ -38,27 +38,29 @@ async function POST_req(options, path, data) {
 }
 
 async function stakesRound(params) {
-    let {players, stakes} = params
+    let {players, stakes, s_hands} = params
     let player_id = 0
     let lord_id = 0
+    let starting_hands = s_hands.map(h => [...h])
     while (player_id < players.length) {
         let req = await POST_req(players[player_id], players[player_id].paths.score, {stakes, 
-                                              hand: players[player_id].cards})
+                                              hand: players[player_id].cards, starting_hands})
         stakes.push(req.score)
         console.log(`${players[player_id].botId} call ${req.score} with hand ${cards_to_string(players[player_id].cards).join('')}`);
         if (req.score == 3) return player_id
         if (req.score > 0) lord_id = player_id
         player_id++
+        starting_hands.push(starting_hands.shift())
     }
     return lord_id
 }
 
 async function playGame(params) {
-    let {players, current_player_id, wild_cards, moves, table_cards} = params
+    let {players, current_player_id, wild_cards, moves, table_cards, starting_hands} = params
     let req = await POST_req(players[current_player_id], players[current_player_id].paths.shot, {table_cards, 
                                         hand: players[current_player_id].cards,
                                         moves,
-                                        wild_cards})
+                                        wild_cards, starting_hands})
     moves.push(req.shot)
     console.log(`${players[current_player_id].botId} shot '${cards_to_string(req.shot).join('')}'  ${cards_to_string(players[current_player_id].cards).join('')}`);
     if (req.shot.length) {
@@ -74,7 +76,8 @@ async function playGame(params) {
         current_player_id: (current_player_id + 1) % 3, 
         wild_cards, 
         table_cards, 
-        moves
+        moves,
+        starting_hands
     })
 }
 
@@ -99,7 +102,7 @@ async function oneGame() {
 
         let stakes = []
 
-        let lord_id = await stakesRound({players, stakes})
+        let lord_id = await stakesRound({players, stakes, starting_hands})
 
         if (lord_id > 0) starting_hands.push(starting_hands.shift())
         if (lord_id === 2) starting_hands.push(starting_hands.shift())
@@ -110,7 +113,8 @@ async function oneGame() {
                     current_player_id: lord_id, 
                     wild_cards: deck, // the three leftover wild cards
                     table_cards: [], 
-                    moves: []})
+                    moves: [],
+                    starting_hands})
         
         if (winner_id === lord_id) console.log('Game Over! Landlord Win')
         else console.log('Game Over! Peasants Win')
