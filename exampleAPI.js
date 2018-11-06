@@ -60,7 +60,8 @@ async function playGame(params) {
     let req = await POST_req(players[current_player_id], players[current_player_id].paths.shot, {table_cards, 
                                         hand: players[current_player_id].cards,
                                         moves,
-                                        wild_cards, starting_hands})
+                                        wild_cards, starting_hands,
+                                    deep: 1})
     moves.push(req.shot)
     console.log(`${players[current_player_id].botId} shot '${cards_to_string(req.shot).join('')}'  ${cards_to_string(players[current_player_id].cards).join('')}`);
     if (req.shot.length) {
@@ -70,7 +71,7 @@ async function playGame(params) {
         try {
             if (moves[moves.length - 2].length == 0) table_cards = [] // two players pass 
         } catch {
-            
+
         }
     }
     log_moves = moves
