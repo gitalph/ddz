@@ -52,7 +52,7 @@ async function stakesRound(params) {
         player_id++
         starting_hands2.push(starting_hands2.shift())
     }
-    return lord_id
+    return -1
 }
 
 async function playGame(params) {
@@ -108,6 +108,8 @@ async function oneGame() {
         let stakes = []
 
         let lord_id = await stakesRound({players, stakes, starting_hands})
+
+        if (lord_id === -1) continue
 
         if (lord_id > 0) starting_hands.push(starting_hands.shift())
         if (lord_id === 2) starting_hands.push(starting_hands.shift())
