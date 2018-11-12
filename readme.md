@@ -27,7 +27,7 @@
 
 * dockerized:
 1. sudo docker build -t minibox .
-1. sudo docker run -it minibox
+1. sudo docker run -it -d --restart=always --name miniNN minibox
 
 *card numbering (suits are not important):
 * 1   A
