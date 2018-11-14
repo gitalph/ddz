@@ -131,7 +131,7 @@ async function oneGame() {
         if (winner_id === lord_id) console.log('Game Over! Landlord Win')
         else console.log('Game Over! Peasants Win')
         
-        await POST_req(gameConf.saveLogs, gameConf.saveLogs.path, {random_position: players.map(b => b.botId), 
+        POST_req(gameConf.saveLogs, gameConf.saveLogs.path, {random_position: players.map(b => b.botId), 
             landlord: players[lord_id].botId, 
             stakes, call_score, multiple, 
             winner: players[winner_id].botId,

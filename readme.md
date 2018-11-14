@@ -29,6 +29,8 @@
 1. sudo docker build -t minibox .
 1. sudo docker run -it -d --restart=always --name miniNN minibox
 
+1. sudo docker build -t minibox3nn .
+
 *card numbering (suits are not important):
 * 1   A
 * 2   2
