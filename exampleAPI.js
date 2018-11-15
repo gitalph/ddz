@@ -26,7 +26,7 @@ async function POST_req(options, path, data) {
             res.setEncoding('utf8');
             let body = '';
             res.on('data', (chunk) => body += chunk);
-            res.on('end', () => resolve(JSON.parse(body)));
+            res.on('end', () => body.length && body[0] === '{' ? resolve(JSON.parse(body)) : resolve(body))
           });
         req.on('error', (e) => {
             console.error(`problem with request: ${e.message}`);
@@ -72,6 +72,11 @@ async function playGame(params) {
     if (req.shot.length) {
         players[current_player_id].cards = players[current_player_id].cards.filter(c => !req.shot.includes(c))
         table_cards = req.shot
+        if (table_cards.length == 2 && table_cards.includes(53) && table_cards.includes(54)) multiple *= 2
+        if (table_cards.length == 4) {
+            let cards = cards_to_string(table_cards)
+            if (cards[0] === cards[1] && cards[0] === cards[2] && cards[0] === cards[3]) multiple *= 2
+        }
     } else {// pass
         try {
             if (moves[moves.length - 2].length == 0) table_cards = [] // two players pass 
@@ -115,7 +120,7 @@ async function oneGame() {
         let lord_id = await stakesRound({players, stakes, starting_hands})
 
         if (lord_id === -1) continue
-
+        multiple = 1
         if (lord_id > 0) starting_hands.push(starting_hands.shift())
         if (lord_id === 2) starting_hands.push(starting_hands.shift())
         let call_score = Math.max(...stakes)
@@ -131,13 +136,21 @@ async function oneGame() {
         if (winner_id === lord_id) console.log('Game Over! Landlord Win')
         else console.log('Game Over! Peasants Win')
         
-        POST_req(gameConf.saveLogs, gameConf.saveLogs.path, {random_position: players.map(b => b.botId), 
+        let saveLogs = {random_position: players.map(b => b.botId), 
             landlord: players[lord_id].botId, 
             stakes, call_score, multiple, 
             winner: players[winner_id].botId,
             moves: log_moves,
             wild_cards: deck,
-            starting_hands})
+            starting_hands}
+        console.log('Game Over! 1')
+        if (gameConf.saveLogs) POST_req(gameConf.saveLogs, gameConf.saveLogs.path, saveLogs)
+        console.log('Game Over! 2')
+        const endGame = async(player) => POST_req(player, player.paths.log, 
+            {NNID: player.botId, ...saveLogs})
+        console.log('Game Over! 3')
+        await Promise.all(players.map(endGame))
+        console.log('Game Over! 4')
     } while (isLoop)
 }
 
