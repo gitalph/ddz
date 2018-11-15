@@ -143,14 +143,11 @@ async function oneGame() {
             moves: log_moves,
             wild_cards: deck,
             starting_hands}
-        console.log('Game Over! 1')
+
         if (gameConf.saveLogs) POST_req(gameConf.saveLogs, gameConf.saveLogs.path, saveLogs)
-        console.log('Game Over! 2')
         const endGame = async(player) => POST_req(player, player.paths.log, 
             {NNID: player.botId, ...saveLogs})
-        console.log('Game Over! 3')
         await Promise.all(players.map(endGame))
-        console.log('Game Over! 4')
     } while (isLoop)
 }
 
