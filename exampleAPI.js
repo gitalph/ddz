@@ -145,8 +145,8 @@ async function oneGame() {
             starting_hands}
 
         if (gameConf.saveLogs) POST_req(gameConf.saveLogs, gameConf.saveLogs.path, saveLogs)
-        const endGame = async(player) => POST_req(player, player.paths.log, 
-            {NNID: player.botId, ...saveLogs})
+        const endGame = async(player) => player.paths.log ? POST_req(player, player.paths.log, 
+            {NNID: player.botId, ...saveLogs}) : 0
         await Promise.all(players.map(endGame))
     } while (isLoop)
 }
