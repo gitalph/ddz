@@ -31,6 +31,12 @@
 
 1. sudo docker build -t minibox3nn .
 
+###config
+
+"saveLogs" for save logs in db
+
+"bots"."paths"."log" - individual bot information 
+
 *card numbering (suits are not important):
 * 1   A
 * 2   2
