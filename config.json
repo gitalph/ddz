@@ -2,25 +2,25 @@
     "bots": [
         {
             "botId": "PlayerA",
-            "hostname": "192.168.1.47",
+            "hostname": "172.17.0.1",
             "port": 6000,
             "paths": {"score": "/score", "shot": "/shot", "log": false}
         },
         {
             "botId": "PlayerB",
-            "hostname": "192.168.1.47",
+            "hostname": "172.17.0.1",
             "port": 6000,
             "paths": {"score": "/score", "shot": "/shot", "log": false}
         },
         {
             "botId": "PlayerC",
-            "hostname": "192.168.1.47",
+            "hostname": "172.17.0.1",
             "port": 6000,
             "paths": {"score": "/score", "shot": "/shot", "log": false}
         }
     ],
     "saveLogs": {
-        "hostname": "192.168.1.47",
+        "hostname": "172.17.0.1",
         "port": 8184,
         "path": "/save_logs"
     }
