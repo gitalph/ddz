@@ -15,6 +15,10 @@ async function POST_req(options, path, data) {
     data = JSON.stringify(data)
     if (isDebug) console.log(data);
     return new Promise(resolve => {
+        function ret(data) {
+            if (isDebug) console.log(data)
+            return resolve(data)
+        }
         const req = http.request({...options, path, method: 'POST', headers: {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(data)
@@ -26,7 +30,7 @@ async function POST_req(options, path, data) {
             res.setEncoding('utf8');
             let body = '';
             res.on('data', (chunk) => body += chunk);
-            res.on('end', () => body.length && body[0] === '{' ? resolve(JSON.parse(body)) : resolve(body))
+            res.on('end', () => body.length && body[0] === '{' ? ret(JSON.parse(body)) : ret(body))
           });
         req.on('error', (e) => {
             console.error(`problem with request: ${e.message}`);

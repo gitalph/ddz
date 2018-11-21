@@ -3,20 +3,20 @@
         {
             "botId": "PlayerA",
             "hostname": "192.168.1.47",
-            "port": 8180,
-            "paths": {"score": "/score_test_1", "shot": "/shot_test_1", "log": "/save_logs"}
+            "port": 6000,
+            "paths": {"score": "/score", "shot": "/shot", "log": false}
         },
         {
             "botId": "PlayerB",
             "hostname": "192.168.1.47",
-            "port": 8180,
-            "paths": {"score": "/score_test_1", "shot": "/shot_test_1", "log": "/save_logs"}
+            "port": 6000,
+            "paths": {"score": "/score", "shot": "/shot", "log": false}
         },
         {
             "botId": "PlayerC",
             "hostname": "192.168.1.47",
             "port": 6000,
-            "paths": {"score": "/score", "shot": "/shot", "log": "/save_logs"}
+            "paths": {"score": "/score", "shot": "/shot", "log": false}
         }
     ],
     "saveLogs": {
