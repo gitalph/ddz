@@ -1,6 +1,15 @@
 const http = require("http")
 const gameConf = require('./config.json')
 
+if (process.env.BOTS) { // PlayerA:6000,PlayerB:7000,PlayerC:8080
+    const replaceNamePort = process.env.BOTS.split(',').map(player => p.split(':'))
+    gameConf.bots.forEach((bot, index) => {
+        bot.botId = replaceNamePort[index][0]
+        bot.port = Number(replaceNamePort[index][1])
+    })
+    console.log(JSON.stringify(gameConf, null, 2))
+}
+
 const isDebug = process.argv.includes('-d')
 const isLoop = process.argv.includes('-l')
 
