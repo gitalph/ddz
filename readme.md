@@ -29,7 +29,7 @@
 1. sudo docker build -t minibox .
 1. sudo docker run -it -d --restart=always --name miniNN minibox
 
-1. sudo docker run -it -d --restart=always -e BOTS=PlayerA:6000,PlayerB:7000,PlayerC:8080 --name miniNN3GO minibox 
+1. sudo docker run -it -d --restart=always -e BOTS=PlayerA:6000,PlayerB:6000,PlayerC:5002 --name miniNN3GO minibox 
 
 1. sudo docker build -t minibox3nn .
 

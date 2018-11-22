@@ -2,7 +2,7 @@ const http = require("http")
 const gameConf = require('./config.json')
 
 if (process.env.BOTS) { // PlayerA:6000,PlayerB:7000,PlayerC:8080
-    const replaceNamePort = process.env.BOTS.split(',').map(player => p.split(':'))
+    const replaceNamePort = process.env.BOTS.split(',').map(player => player.split(':'))
     gameConf.bots.forEach((bot, index) => {
         bot.botId = replaceNamePort[index][0]
         bot.port = Number(replaceNamePort[index][1])
